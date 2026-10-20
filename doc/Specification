@@ -1,0 +1,178 @@
+# UI/UX Specification — Complete Interactive Experience
+
+## 1. UX Concept
+AI Arena should feel like a premium interactive AI laboratory rather than a static chatbot.
+
+**Curiosity → Comparison → Decision → Surprise → Insight → Discovery**
+
+The signature moment is the transformation from anonymous Model A/Model B into actual model identities.
+
+## 2. Design Language
+Modern, minimal, technical, neutral, readable, responsive, subtle depth, smooth motion.
+
+Avoid heavy provider branding, excessive gradients, constant motion, and unequal A/B treatment.
+
+## 3. Information Architecture
+```text
+AI ARENA
+├── Compare
+│   ├── Prompt
+│   ├── Blind responses
+│   ├── Vote
+│   └── Reveal
+├── Insights
+│   ├── Overview
+│   ├── By category
+│   ├── By model
+│   └── Feedback
+├── Arena
+│   ├── Global statistics
+│   └── Pairwise exploration
+├── History
+└── Settings
+```
+
+## 4. Landing
+Headline: **Compare AI without knowing who answered.**
+Subheading: **Two AI models answer. You choose. Their identities are revealed afterward.**
+
+Motion:
+- Hero content reveals on load.
+- Logo/mark settles.
+- Subtle background movement.
+- CTA hover/press.
+- Statistics count up on entry.
+- Sections reveal during scroll.
+
+## 5. Compare
+Prompt editor, category selector, optional difficulty, suggested prompts, Compare button.
+
+Focus expands subtly. Suggestions appear. Validation is non-disruptive. Submit locks input and enters generation state.
+
+## 6. Generation
+Show:
+> **Generating two independent responses...**
+
+Use neutral skeletons for A and B. When a response arrives, skeleton transitions into content. If one finishes first, show a neutral waiting message.
+
+Never reveal provider identity through names, logos, colors, metadata, or loading language.
+
+## 7. Blind Comparison
+Two equal cards:
+```text
+┌─────────────────────┐
+│       MODEL A       │
+│   Response...       │
+│       [Copy]        │
+└─────────────────────┘
+
+          VS
+
+┌─────────────────────┐
+│       MODEL B       │
+│   Response...       │
+│       [Copy]        │
+└─────────────────────┘
+```
+
+Interaction: subtle hover lift, press feedback, copy confirmation, expand/collapse.
+
+## 8. Voting
+Prompt: **Which response do you prefer?**
+
+Primary: A is better / B is better.
+Secondary: Both are good / Neither.
+
+Selected card slightly scales/lifts and gains emphasis. Other card de-emphasizes. Then transition to reveal.
+
+## 9. Reveal — Signature Interaction
+Sequence:
+```text
+YOUR CHOICE
+↓
+MODEL A
+↓
+REVEAL
+↓
+ACTUAL MODEL
+```
+
+The anonymous A/B identity transforms into provider/model information. Keep the response visually connected to the answer the user evaluated.
+
+Then show:
+> **Your preference has been recorded.**
+
+## 10. Feedback
+After reveal, optional chips:
+Accuracy, Clarity, Reasoning, Conciseness, Formatting, Creativity, Code quality, Fewer errors, Depth, Other.
+
+Chips enter with a small stagger.
+
+## 11. Insights
+Title: **Your AI Preference Profile**
+
+Animated metrics:
+- Comparisons
+- Models tested
+- Categories tested
+- Preference concentration
+
+Charts grow/draw into view. Hovering a model highlights related data. Clicking a category filters the dashboard.
+
+Always include evidence:
+> Claude — 72% preference across 48 comparisons
+
+## 12. Recommendation
+Show:
+> **Your next matchup**
+
+A short selection animation can communicate that the system is choosing a comparison. Then return to blind A/B. Do not reveal which model was selected because of prior preference before the vote.
+
+## 13. Arena
+Global anonymous aggregate data with model cards, pairwise comparisons, category/time filters, exposure, and selection statistics.
+
+Do not visually imply that aggregate preference is objective model quality.
+
+## 14. History
+Each item: prompt preview, category, date, choice, revealed models.
+
+Interactions: expand, open details, copy response, view feedback.
+
+## 15. Settings
+Appearance: light/dark/system.
+Interaction: reduced motion, streaming/progressive display, default category.
+Privacy: save history, delete history, anonymized global participation, export.
+
+## 16. Responsive
+Desktop: side-by-side responses and full analytics.
+Tablet: flexible two-column layout.
+Mobile: stacked responses, sticky voting area, collapsible long responses, touch-friendly controls.
+
+## 17. Accessibility
+Keyboard navigation, semantic controls, visible focus, screen-reader labels, sufficient contrast, no color-only information, reduced motion, accessible copy controls.
+
+## 18. Motion Tokens
+Micro 120–180 ms; standard 180–300 ms; content 250–500 ms; reveal 350–700 ms.
+
+Respect `prefers-reduced-motion: reduce`:
+- Disable parallax.
+- Reduce transforms.
+- Use quick fades.
+- Keep functional feedback.
+
+## 19. Complete Interaction Inventory
+Landing: scroll reveal, CTA hover/press, counters.
+Prompt: focus expansion, chips, validation.
+Generation: skeleton, progressive response.
+Comparison: hover, copy, expand.
+Voting: selection, confirmation.
+Reveal: identity transformation.
+Feedback: staggered chips.
+Insights: animated numbers/charts, filters.
+Arena: filter transitions.
+History: expandable cards.
+Recommendation: matchup transition.
+Mobile: sticky vote controls.
+
+## 20. UX Success Criteria
+The user always knows what stage they are in, what action is expected, whether it succeeded, when identities are hidden, when they are revealed, and how their preference contributes to personalization.

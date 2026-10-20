@@ -1,0 +1,300 @@
+# Implementation Document — AI Arena
+
+## 1. Architecture
+```text
+Web Frontend
+Next.js + React + TypeScript + Tailwind + Motion
+        ↓
+API Layer
+REST/tRPC or FastAPI
+        ↓
+Comparison Service | Recommender Service | Analytics Service
+        ↓
+PostgreSQL
+        ↓
+Model Provider Adapters
+```
+
+## 2. Recommended Stack
+Frontend: Next.js, React, TypeScript, Tailwind CSS, Motion/Framer Motion, Recharts.
+
+Backend: Next.js API/server actions or FastAPI + Python.
+
+Database: PostgreSQL.
+ORM: Prisma or SQLAlchemy.
+Auth: Auth.js, Clerk, Supabase Auth, or equivalent.
+
+## 3. Frontend Motion Architecture
+Create reusable motion components:
+```text
+components/motion/
+├── PageTransition
+├── FadeIn
+├── SlideIn
+├── ScalePress
+├── RevealTransition
+├── AnimatedNumber
+└── StaggerContainer
+```
+
+Centralize motion timings so the site feels consistent.
+
+## 4. Comparison State Machine
+```text
+IDLE
+↓
+SUBMITTING
+↓
+GENERATING
+↓
+READY_TO_VOTE
+↓
+VOTING
+↓
+REVEALING
+↓
+FEEDBACK
+↓
+COMPLETED
+```
+
+## 5. Model Adapter
+```text
+ModelAdapter
+├── model_id
+├── provider_id
+├── display_name
+├── generate()
+├── stream()
+└── health_check()
+```
+
+Keep provider-specific logic behind adapters.
+
+## 6. Comparison API
+`POST /api/comparisons`
+```json
+{"prompt":"Explain recursion in Python","category":"programming"}
+```
+
+Return:
+```json
+{"comparisonId":"cmp_123","blind":true,"responseA":"...","responseB":"..."}
+```
+
+Do not return model identities.
+
+`POST /api/comparisons/{id}/vote`
+```json
+{"choice":"A","feedback":["clarity","accuracy"]}
+```
+
+After a valid vote, return the reveal.
+
+## 7. Critical Blindness Implementation
+Never send model names to the client and hide them with CSS.
+
+Correct:
+```text
+Backend selects X/Y
+↓
+Server randomizes A/B
+↓
+Server stores mapping
+↓
+Client receives only responses
+↓
+User votes
+↓
+Server validates vote
+↓
+Server returns identity mapping
+```
+
+The server is the source of truth.
+
+## 8. A/B Randomization
+```text
+if random() < 0.5:
+    A = X
+    B = Y
+else:
+    A = Y
+    B = X
+```
+Store the assignment server-side.
+
+## 9. Model Generation
+Call the two models in parallel where possible. Use timeouts, retries, and provider-specific errors.
+
+If one model fails, mark the comparison incomplete and do not accept a valid preference.
+
+## 10. Database
+### users
+`id, email, created_at`
+
+### models
+`id, provider_id, display_name, is_active, created_at`
+
+### comparisons
+`id, user_id, prompt, category, difficulty, model_a_id, model_b_id, response_a, response_b, status, created_at`
+
+### preferences
+`id, comparison_id, user_id, choice, feedback, created_at`
+
+### model_statistics
+`user_id, model_id, category, exposures, selections, ties, updated_at`
+
+### recommendation_events
+`id, user_id, comparison_id, selection_strategy, created_at`
+
+## 11. Recommendation Engine
+
+### MVP
+`preference_rate = selections / exposure`
+
+Apply evidence adjustment:
+```text
+evidence_factor = min(exposure / minimum_evidence, 1)
+adjusted_score = preference_rate × evidence_factor
+```
+
+### Bayesian
+```text
+alpha = 1 + selections
+beta = 1 + losses
+posterior_mean = alpha / (alpha + beta)
+```
+
+### Advanced
+Thompson Sampling:
+1. Maintain posterior.
+2. Sample candidate utility.
+3. Select matchup.
+4. Observe preference.
+5. Update posterior.
+
+## 12. Pairwise Ranking
+Store X vs Y with outcome X/Y/Tie. Future versions can support Elo, Bradley-Terry, or Bayesian paired-comparison models.
+
+Keep global rankings separate from personal preference.
+
+## 13. Exploration vs Exploitation
+Start around:
+`80% personalized/exploitation`
+`20% exploration`
+
+Exploration prioritizes low-exposure models, new models, under-tested categories, and rarely compared pairs.
+
+## 14. Prompt Classification
+MVP: user selects category.
+Later: classifier predicts category with confidence.
+
+Categories: Programming, Writing, Education, Mathematics, Research, Creative, Data Analysis, Reasoning, General, Professional.
+
+## 15. Feedback
+Store reasons such as accuracy, clarity, reasoning, conciseness, formatting, creativity, code quality, fewer errors, and depth.
+
+This can later reveal what qualities drive a user's selections.
+
+## 16. Interactive Frontend Implementation
+
+### Landing
+Scroll observers, motion variants, animated numbers, hover/press components, subtle parallax.
+
+### Prompt
+Controlled textarea, animated focus, suggestions, validation, loading transition.
+
+### Generation
+Skeleton components, streaming/progressive rendering, completion transitions.
+
+### Comparison
+Equal cards, expand/collapse, copy feedback, hover/press states.
+
+### Vote
+Selected-card animation, non-selected de-emphasis, confirmation.
+
+### Reveal
+Dedicated `RevealTransition` component:
+Vote → confirmation → A/B transformation → identity reveal → feedback.
+
+### Insights
+AnimatedNumber, animated charts, filters, hover synchronization, low-evidence states.
+
+### History
+Expandable cards and smooth detail transitions.
+
+## 17. Motion Accessibility
+Respect `prefers-reduced-motion`. Disable parallax and large transforms, use short fades, and never make information dependent on animation.
+
+## 18. Security
+Server-side API keys, authentication, authorization, rate limiting, input validation, prompt/output limits, secure DB access, limited logging, and server-validated reveal/vote state.
+
+## 19. Cost Control
+Track input/output tokens and provider costs. Use mock responses during UI development, inexpensive development models, prompt/response limits, and per-user limits.
+
+## 20. Observability
+Monitor comparison latency, provider latency, error rate, vote completion, recommendation events, token usage, and database failures.
+
+## 21. Testing
+### Unit
+A/B randomization, preference calculations, Bayesian updates, exploration, ties, classification.
+
+### Integration
+Create comparison, generate responses, vote, reveal, update statistics.
+
+### E2E
+Landing → Prompt → Generate → Blind comparison → Vote → Reveal → Feedback → History → Insights → Next recommendation.
+
+### Blindness security test
+Verify model names and IDs are absent from pre-vote API responses and reveal requires a valid vote.
+
+## 22. Folder Structure
+```text
+ai-arena/
+├── app/
+│   ├── page.tsx
+│   ├── compare/
+│   ├── insights/
+│   ├── arena/
+│   ├── history/
+│   └── settings/
+├── components/
+│   ├── comparison/
+│   ├── charts/
+│   ├── motion/
+│   ├── layout/
+│   └── ui/
+├── lib/
+│   ├── models/
+│   ├── recommendation/
+│   ├── analytics/
+│   ├── classification/
+│   └── db/
+├── api/
+├── tests/
+└── prisma/
+```
+
+## 23. Roadmap
+Phase 1: UI/motion prototype.
+Phase 2: Functional frontend with mock data.
+Phase 3: AI provider integration.
+Phase 4: Database.
+Phase 5: Personalization.
+Phase 6: Advanced recommender.
+Phase 7: Analytics.
+Phase 8: Accessibility, mobile, security, monitoring, deployment.
+
+## 24. Demo
+Landing → blind programming comparison → vote → reveal → feedback → repeat by category → Insights → adaptive matchup → Global Arena.
+
+## 25. Technical Value
+Full-stack engineering, multiple AI APIs, secure abstraction, blind A/B experimentation, human preference collection, recommender systems, Bayesian/statistical methods, visualization, motion design, accessibility, privacy, and cost-aware AI engineering.
+
+## 26. Limitation
+Blind comparison reduces identity/brand influence but does not eliminate preference bias. Users may still prefer writing style, length, tone, formatting, or reasoning patterns.
+
+Use the description:
+> **A blind, bias-reducing human preference evaluation system.**
+

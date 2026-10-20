@@ -1,0 +1,117 @@
+# Product Requirements Document — AI Arena
+
+## 1. Vision
+Create an interactive platform where users compare AI-generated answers without seeing model identities, record preferences, and progressively receive personalized AI model recommendations.
+
+## 2. Principles
+1. Blind before reveal.
+2. Randomize A/B assignment server-side.
+3. Same prompt/context for both models.
+4. No model identity leakage before voting.
+5. Separate personal preference from global statistics.
+6. Treat small samples cautiously.
+7. Motion communicates state and feedback.
+8. Exploration prevents early preferences from trapping the recommender.
+
+## 3. Objectives
+- Reduce model-name/brand influence.
+- Collect structured human preference data.
+- Learn task-specific preferences.
+- Generate adaptive comparisons.
+- Provide transparent analytics.
+- Demonstrate full-stack AI and recommender-system engineering.
+
+## 4. Non-Goals
+The MVP will not declare a universally best AI, claim complete bias elimination, replace standardized benchmarks, expose private prompts publicly, or treat tiny samples as conclusive.
+
+## 5. Target Users
+Students, developers, researchers, AI enthusiasts, and users who regularly use multiple AI systems.
+
+## 6. User Journey
+Landing → Start → Prompt → Category → Generate → Blind Compare → Vote → Reveal → Feedback → Profile Update → Adaptive Next Comparison.
+
+## 7. Functional Requirements
+- Prompt entry and validation
+- Pair selection of two distinct models
+- Server-side A/B randomization
+- Parallel response generation
+- Blind response display
+- A/B/Tie/Neither voting
+- Post-vote identity reveal
+- Optional feedback
+- Persistent comparison/history
+- Personal analytics
+- Adaptive recommendations
+- Exploration of under-tested models/categories
+
+## 8. Interactive UX Requirements
+### Landing
+Entry animations, scroll reveals, CTA hover/press, subtle parallax, animated counters.
+
+### Prompt
+Focus transition, suggestion chips, live validation, category selection, loading state.
+
+### Generation
+Skeletons, progressive rendering where supported, neutral loading language, partial-generation state.
+
+### Comparison
+Card hover, copy interaction, expand/collapse, equal visual treatment.
+
+### Voting
+Selection emphasis, non-selected de-emphasis, confirmation, transition to reveal.
+
+### Reveal
+A/B identity transformation, model information entrance, feedback-chip appearance.
+
+### Insights
+Animated counters/charts, filtering, model highlighting, timeframe transitions.
+
+### Arena
+Interactive aggregate statistics and smooth filter transitions.
+
+### History
+Expandable cards and detail transitions.
+
+### Recommendation
+Animated matchup selection without leaking identities.
+
+## 9. Motion System
+Motion roles: **feedback, orientation, state, hierarchy**.
+
+Suggested starting timings:
+- Micro: 120–180 ms
+- Standard: 180–300 ms
+- Content: 250–500 ms
+- Signature reveal: 350–700 ms
+
+Respect `prefers-reduced-motion`. Avoid constant or distracting animation.
+
+## 10. Recommendation
+MVP: exposure, selection, preference rate, evidence adjustment, exploration.
+
+Advanced: Beta-Bernoulli, Thompson Sampling, Bradley-Terry, contextual bandits.
+
+Keep ties separate from wins/losses.
+
+## 11. Categories
+Programming, Writing, Education, Mathematics, Research, Creative, Data Analysis, Reasoning, General, Professional.
+
+## 12. Feedback
+Accuracy, Clarity, Reasoning, Conciseness, Formatting, Creativity, Code quality, Fewer errors, Depth, Other.
+
+## 13. Analytics
+Personal: comparisons, models tested, preference distribution, category preference, pairwise history, feedback, evidence/sample size.
+
+Global: anonymized aggregate exposure and selection statistics.
+
+## 14. Privacy
+Keep provider keys server-side. Do not expose private prompts in public analytics. Support history deletion and anonymized aggregate participation.
+
+## 15. Edge Cases
+Provider failure, both providers failing, duplicate model pair, abandoned comparison, ties, long prompts, rate limits, slow providers, moderation/safety rejection.
+
+## 16. Acceptance Criteria
+A valid comparison requires two distinct models, equivalent prompt, randomized A/B, no pre-vote identity exposure, successful responses, user outcome, persistence, reveal, and updated statistics.
+
+## 17. MVP Definition of Done
+A user can compare two blind responses, vote, see the reveal, optionally give feedback, view history and preferences, and receive adaptive future matchups.
